@@ -4,7 +4,7 @@ const { getContract } = require('./utils')
 const users = require('../conf/users.json')
 const Web3 = require('web3')
 const soliditysha3 = require('solidity-sha3').default
-const web3 = new Web3()
+const web3 = new Web3('http://localhost:8545')
 const { eth } = web3
 
 contract('Settlement', (accounts) => {
@@ -33,8 +33,9 @@ contract('Settlement', (accounts) => {
     try {
       const settlement = await Settlement.deployed()
       const hash = sha3('hello world')
+      console.log('hash check', hash)
       const msgHash = hashPersonalMessage(hash)
-      const signature = ecsign(hash, new Buffer(users[0].privKey.substring(2), 'hex'))
+      const signature = ecsign(msgHash, new Buffer(users[0].secretKey.substring(2), 'hex'))
       const sig = [
         signature.v,
         signature.r.toString('hex'),
@@ -50,5 +51,22 @@ contract('Settlement', (accounts) => {
     }
   })
 
-
+  it ('Should verify signatrue w/ web3 signer', async () => {
+    try {
+      const settlement = await Settlement.deployed()
+      const hash = soliditysha3('hello world')
+      const signature = await eth.sign(hash, users[0].pubAddress)
+      const r = "0x"+signature.substr(2, 64)
+      const s = "0x"+signature.substr(66, 64)
+      const v = 27 + Number(signature.substr(130, 2))
+      const sig = [v, r, s]
+      console.log('v', v)
+      console.log('r', r)
+      console.log('s', s)
+      const address = await settlement.verifySignature.call(hash, sig)
+      console.log('address', address)
+    } catch (err) {
+      console.log(err)
+    }
+  })
 })
