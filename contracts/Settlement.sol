@@ -1,6 +1,19 @@
 pragma solidity ^0.4.7;
 
 contract Settlement {
+    /*
+      STATE
+    */
+    address tokenA;
+    address tokenB;
+
+    /*
+      CONSTRUCTOR
+    */
+    function Settlement(address _tokenA, address _tokenB) {
+      
+    }
+
     function verifyMsg() returns (bytes32) {
         return sha3('hello world');
     }
@@ -13,4 +26,5 @@ contract Settlement {
         bytes32 msgHash = sha3(prefix, _msg);
         return ecrecover(msgHash, v, r, s);
     }
+
 }
