@@ -8,11 +8,11 @@ let swarm = []
 
 async function createUser() {
   try {
-    const privKey = await keys.create(params).privateKey.toString('hex').replace(/^/,'0x')
-    const pubKey = await privateToPublic(privKey).toString('hex').replace(/^/, '0x')
-    const pubAddress = await privateToAddress(privKey).toString('hex').replace(/^/, '0x')
+    const secretKey = await keys.create(params).privateKey.toString('hex').replace(/^/,'0x')
+    const pubKey = await privateToPublic(secretKey).toString('hex').replace(/^/, '0x')
+    const pubAddress = await privateToAddress(secretKey).toString('hex').replace(/^/, '0x')
     return ({
-      privKey,
+      secretKey,
       pubKey,
       pubAddress,
       balance: '0x28DF9A72FDE228000'
