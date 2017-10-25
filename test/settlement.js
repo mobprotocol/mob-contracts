@@ -29,25 +29,26 @@ contract('Settlement', (accounts) => {
     }
   })
 
-  it ('Should verify signature', async () => {
+  it ('Should verify signature w/ ethereumjs-util', async () => {
     try {
       const settlement = await Settlement.deployed()
-      const hash = hashPersonalMessage(Buffer.from('hello world', 'utf8'))
-      console.log('hash', hash)
+      const hash = sha3('hello world')
+      const msgHash = hashPersonalMessage(hash)
       const signature = ecsign(hash, new Buffer(users[0].privKey.substring(2), 'hex'))
       const sig = [
         signature.v,
         signature.r.toString('hex'),
         signature.s.toString('hex')
       ]
-      console.log('hash', hash.toString('hex').replace(/^/, '0x'))
+      console.log('msgHash', msgHash.toString('hex').replace(/^/, '0x'))
       console.log('sig', sig)
       const address = await settlement.verifySignature.call(hash, sig)
-      console.log('address', address)
       console.log('signer', users[0].pubAddress)
+      console.log('address', address)
     } catch (err) {
       console.log('### error in test2', err)
     }
   })
+
 
 })
