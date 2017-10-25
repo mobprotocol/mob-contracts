@@ -9,12 +9,37 @@ contract Token {
   uint256 public decimals;
   uint256 public supply;
   mapping(address => uint) balances;
-  mapping(address => mapping(address => uint)) allowances;
+  mapping(address => mapping(address => uint)) approvals;
 
   function Token(string _name, string _symbol, uint256 _decimals, uint256 _supply) {
-    name = _name;
-    symbol = _symbol;
-    decimal = _decimal;
-    supply = _supply;
+      name = _name;
+      symbol = _symbol;
+      decimals = _decimals;
+      supply = _supply;
+  }
+
+  function transfer(address _to, uint256 _value) returns (bool) {
+      require(_value <= balances[msg.sender]);
+      balances[msg.sender] -= _value;
+      balances[_to] += _value;
+      Transfer(msg.sender, _to, _value);
+      return true;
+
+  }
+
+  function approve(address _spender, uint _value ) returns (bool) {
+      require(_value <= balances[msg.sender]);
+      approvals[msg.sender][_spender] = _value;
+      Approval(msg.sender, _spender, _value);
+      return true;
+  }
+
+  function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
+      require(_value <= approvals[_from][msg.sender]);
+      approvals[_from][msg.sender] -= _value;
+      balances[_from] -= _value;
+      balances[_to] += _value;
+      Transfer(_from, _to, _value);
+      return true;
   }
 }
