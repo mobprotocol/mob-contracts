@@ -10,20 +10,14 @@ const { eth } = web3
 contract('Settlement', (accounts) => {
   it ('Verify js and solidity sha3 conformity :)', async () => {
     try {
-      const hash = sha3('hello world')
-      const msgHash = hashPersonalMessage(hash)
       const settlement = await Settlement.deployed()
-      const hash2 = await settlement.verifyMsg.call()
-      console.log('hash1', hash.toString('hex'))
-      console.log('hash2', hash2)
-      const msgHash2 = await settlement.verifyHash.call(hash)
-      const msgHash3 = soliditysha3("\x19Ethereum Signed Message:\n32", hash)
-      console.log('msgHash', msgHash.toString('hex'))
-      console.log('msgHash2', msgHash2)
-      console.log('msgHash3', msgHash3)
-      // const hash2 = await settlement.checkHash.call()
-      // assert.equal(hash1, hash2)
+      const hash = sha3('hello world')
+      console.log('hash here', hash.toString('hex').replace(/^/, '0x'))
+      const msgHash = await settlement.verifyHash.call(hash.toString('hex').replace(/^/, '0x'))
+      const msgHash2 = hashPersonalMessage(hash).toString('hex').replace(/^/, '0x')
 
+      console.log('msgHash', msgHash)
+      console.log('msgHash2', msgHash2)
     } catch (err) {
       console.log('### error in test1', err)
     }
@@ -38,12 +32,17 @@ contract('Settlement', (accounts) => {
       const signature = ecsign(msgHash, new Buffer(users[0].secretKey.substring(2), 'hex'))
       const sig = [
         signature.v,
-        signature.r.toString('hex'),
-        signature.s.toString('hex')
+        '0x' + signature.r.toString('hex'),
+        '0x' + signature.s.toString('hex')
       ]
       console.log('msgHash', msgHash.toString('hex').replace(/^/, '0x'))
       console.log('sig', sig)
-      const address = await settlement.verifySignature.call(hash, sig)
+      const address = await settlement.verifySignature.call(
+        hash.toString('hex').replace(/^/, '0x'),
+        sig[0],
+        sig[1],
+        sig[2]
+      )
       console.log('signer', users[0].pubAddress)
       console.log('address', address)
     } catch (err) {
@@ -63,8 +62,10 @@ contract('Settlement', (accounts) => {
       console.log('v', v)
       console.log('r', r)
       console.log('s', s)
-      const address = await settlement.verifySignature.call(hash, sig)
-      console.log('address', address)
+      console.log('hash', hash)
+      const address = await settlement.verifySignature.call(hash, v, r, s)
+      console.log('actual signer', users[0].pubAddress)
+      console.log('recovered signer', address)
     } catch (err) {
       console.log(err)
     }
