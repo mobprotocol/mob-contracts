@@ -2,6 +2,7 @@ const Settlement = artifacts.require('./Settlement')
 const Token = artifacts.require('./Token')
 const Tokens = require('../../conf/tokens.json')
 const BN = require('bn.js')
+const { calcPermID } = require('./utils')
 
 contract('Settlement', accts => {
   before(async () => {
@@ -9,6 +10,7 @@ contract('Settlement', accts => {
     const settlement = await Settlement.deployed()
     const TokenA = await Token.new(Tokens[0].name, Tokens[0].symbol, Tokens[0].decimals, Tokens[0].supply)
     const TokenB = await Token.new(Tokens[1].name, Tokens[1].symbol, Tokens[1].decimals, Tokens[1].supply)
+    const permutationID = await calcPermID(TokenA.address, TokenB.address)
   })
 
   it('Should submit two signed orders to atomic swap', async () => {
