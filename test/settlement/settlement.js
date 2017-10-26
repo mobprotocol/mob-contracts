@@ -35,7 +35,7 @@ contract('Settlement', accts => {
       }
       const signature1 = await signOrder(order1, Users[0].secretKey)
       const signature2 = await signOrder(order2, Users[1].secretKey)
-      console.log('signature1', signature1)
+      
     } catch (err) {
       console.log('### error in atomic swap test 1', err)
     }

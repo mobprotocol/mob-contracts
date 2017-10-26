@@ -1,5 +1,7 @@
 const soliditySha3 = require('solidity-sha3').default
 const { hashPersonalMessage, sha3, ecsign} = require('ethereumjs-util')
+const crypto = require('crypto')
+
 const calcPermID = async (address1, address2) => {
   try {
     const adrs1 = address1.slice(2)
@@ -26,6 +28,10 @@ const signOrder = async (order, pk) => {
   } catch (err) {
     console.log('### error in singOrder', err)
   }
+}
+
+const generateSalt = async () => {
+  return '0x' + crypto.randomBytes(32).toString('hex')
 }
 
 module.exports = {
