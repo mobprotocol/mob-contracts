@@ -3,7 +3,7 @@ const Token = artifacts.require('./Token')
 const Tokens = require('../../conf/tokens.json')
 const Users = require('../../conf/users.json')
 const BN = require('bn.js')
-const { calcPermID, signOrder } = require('./utils')
+const { calcPermID, signOrder, generateSalt } = require('./utils')
 
 contract('Settlement', accts => {
   let settlement
@@ -22,20 +22,26 @@ contract('Settlement', accts => {
   it('Should submit two signed orders to atomic swap', async () => {
     try  {
       const order1 = {
-        price: new BN(550, 10),
+        price: new BN(550),
         quantity: new BN(50),
         sell: TokenA.address,
-        permutationID
+        permutationID,
+        expiration: new BN((Date.now()/1000) + 604800),
+        salt: await generateSalt()
       }
       const order2 = {
         price: new BN(1500, 10),
         quanity: new BN(100),
         sell: TokenB.address,
-        permutationID
+        permutationID,
+        expiration: new BN((Date.now()/1000) + 604800),
+        salt: await generateSalt()
       }
+      console.log('order1', order1)
+      console.log('expiration1', order1.expiration.toString())
       const signature1 = await signOrder(order1, Users[0].secretKey)
       const signature2 = await signOrder(order2, Users[1].secretKey)
-      
+      // settlement.atomicSwap.call()
     } catch (err) {
       console.log('### error in atomic swap test 1', err)
     }

@@ -36,5 +36,6 @@ const generateSalt = async () => {
 
 module.exports = {
   calcPermID,
-  signOrder
+  signOrder,
+  generateSalt
 }
