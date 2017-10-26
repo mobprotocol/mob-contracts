@@ -1,14 +1,16 @@
 const Settlement = artifacts.require('./Settlement')
 const Token = artifacts.require('./Token')
 const Tokens = require('../../conf/tokens.json')
+const Users = require('../../conf/users.json')
 const BN = require('bn.js')
-const { calcPermID } = require('./utils')
+const { calcPermID, signOrder } = require('./utils')
 
 contract('Settlement', accts => {
   let settlement
   let TokenA
   let TokenB
   let permutationID
+
   before(async () => {
     console.log('### before')
     settlement = await Settlement.deployed()
@@ -31,6 +33,9 @@ contract('Settlement', accts => {
         sell: TokenB.address,
         permutationID
       }
+      const signature1 = await signOrder(order1, Users[0].secretKey)
+      const signature2 = await signOrder(order2, Users[1].secretKey)
+      console.log('signature1', signature1)
     } catch (err) {
       console.log('### error in atomic swap test 1', err)
     }
